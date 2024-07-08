@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Load the 'WWTP' sheet
-file_path = 'IW-TEC-100-007.xlsx'
+file_path = '/IW-TEC-100-007.xlsx'
 wwtp_df = pd.read_excel(file_path, sheet_name='WWTP')
 
 # Drop fully empty rows and columns
