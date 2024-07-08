@@ -2,44 +2,58 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Sample hierarchical data with more levels
-data = [
-    ['Water Treatment Plant', 'WTP', 'ACCESS CONTROL SECURITY', 'ACCS', 'ACCESS CONTROL', 'ACCC'],
-    ['Water Treatment Plant', 'WTP', 'ACCESS CONTROL SECURITY', 'ACCS', 'CCTV', 'CCTV'],
-    ['Water Treatment Plant', 'WTP', 'ACCESS CONTROL SECURITY', 'ACCS', 'GATE | BARRIER', 'GOB'],
-    ['Water Network Pumping Station', 'WNPS', 'ACTUATOR', 'ACTU', 'ELECTRIC', 'ELEC'],
-    ['Water Network Pumping Station', 'WNPS', 'ACTUATOR', 'ACTU', 'HYDRAULIC', 'HLIC'],
-    ['Water Network Pumping Station', 'WNPS', 'ACTUATOR', 'ACTU', 'MANUAL', 'MANU'],
-    ['Water Network Pumping Station', 'WNPS', 'ACTUATOR', 'ACTU', 'PNEUMATIC', 'PNEU'],
-    ['Water Network Storage', 'WNS', 'AERATOR', 'ARTR', 'CASCADE', 'CASC'],
-    ['Water Network Storage', 'WNS', 'AERATOR', 'ARTR', 'DIFFUSED - COARSE', 'DIFC'],
-    ['Water Network Storage', 'WNS', 'AERATOR', 'ARTR', 'DIFFUSED - FINE', 'DIFI'],
-    ['Water Network Storage', 'WNS', 'AERATOR', 'ARTR', 'MECHANICAL - SURFACE', 'MSUR'],
-    ['Water Abstraction Point', 'WAP', 'AIR CONDITIONING', 'ACON', 'HEVAC', 'HEVA'],
-    ['Water Abstraction Point', 'WAP', 'AIR CONDITIONING', 'ACON', 'PROCESS', 'PROC'],
-    ['Waste Water Treatment Plant', 'WWTP', 'AIR TREATMENT', 'AIRT', 'BIO MEDIA', 'BMED'],
-    ['Waste Water Treatment Plant', 'WWTP', 'AIR TREATMENT', 'AIRT', 'CARBON', 'CARB'],
-    ['Waste Water Treatment Plant', 'WWTP', 'AIR TREATMENT', 'AIRT', 'CHEMICAL (SCRUBBER)', 'CHES'],
-    ['Waste Water Treatment Plant', 'WWTP', 'AIR TREATMENT', 'AIRT', 'DUST', 'DUST'],
-    ['Waste Water Treatment Plant', 'WWTP', 'AIR TREATMENT', 'AIRT', 'LIQUID PHASE (SEPTICITY)', 'LPHA'],
-    ['Waste Water Treatment Plant', 'WWTP', 'AIR TREATMENT', 'AIRT', 'PACKAGE', 'PACK']
-]
+# Load the full WWTP hierarchy from the Excel file
+file_path = '/mnt/data/IW-TEC-100-007.xlsx'
+wwtp_df = pd.read_excel(file_path, sheet_name='WWTP')
+
+# Clean the data by dropping any fully empty columns and rows
+wwtp_df.dropna(how='all', axis=1, inplace=True)
+wwtp_df.dropna(how='all', axis=0, inplace=True)
+
+# Display the cleaned data to understand its structure
+st.write("First few rows of the WWTP sheet:")
+st.dataframe(wwtp_df.head())
+
+# Assuming columns represent hierarchical levels, extract these into a structured DataFrame
+# The columns to extract will depend on actual column names/structure seen in the above step
+# Example below assumes a certain structure, adjust as necessary
+columns_to_use = ['Return to Contents page', 'Unnamed: 1', 'Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4']
+
+# Renaming columns for clarity
+wwtp_df.columns = ['Level 1', 'Ref Level 1', 'Level 2', 'Ref Level 2', 'Level 3', 'Ref Level 3', 'Level 4', 'Ref Level 4', 'Level 5', 'Ref Level 5']
+
+# Filtering necessary columns
+hierarchy_data = wwtp_df[['Level 1', 'Ref Level 1', 'Level 2', 'Ref Level 2', 'Level 3', 'Ref Level 3', 'Level 4', 'Ref Level 4', 'Level 5', 'Ref Level 5']].dropna()
+
+# Creating a hierarchical data structure
+data = []
+
+for _, row in hierarchy_data.iterrows():
+    data.append([
+        'Wastewater Treatment Plant',  # Adding the main plant type
+        'WWTP',
+        row['Level 1'], row['Ref Level 1'],
+        row['Level 2'], row['Ref Level 2'],
+        row['Level 3'], row['Ref Level 3'],
+        row['Level 4'], row['Ref Level 4'],
+        row['Level 5'], row['Ref Level 5']
+    ])
 
 # Convert to DataFrame
 hierarchy_df = pd.DataFrame(data, columns=[
-    'Plant Type', 'Plant Type Ref', 'Level 8 Class 1', 'L8 Ref Class 1', 'Level 8 Class 2', 'L8 Ref Class 2'
+    'Plant Type', 'Plant Type Ref', 'Level 1', 'Ref Level 1', 'Level 2', 'Ref Level 2', 'Level 3', 'Ref Level 3', 'Level 4', 'Ref Level 4', 'Level 5', 'Ref Level 5'
 ])
 
 # Streamlit app
-st.title('Asset Hierarchy')
+st.title('Wastewater Treatment Plant Hierarchy')
 
 # Create a treemap using plotly
 fig = px.treemap(
     hierarchy_df,
-    path=['Plant Type', 'Level 8 Class 1', 'Level 8 Class 2'],
+    path=['Plant Type', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
     values=[1]*len(hierarchy_df),  # Assigning an arbitrary value for size
-    color='Plant Type',
-    hover_data={'Plant Type Ref': True, 'L8 Ref Class 1': True, 'L8 Ref Class 2': True}
+    color='Level 1',
+    hover_data={'Plant Type Ref': True, 'Ref Level 1': True, 'Ref Level 2': True, 'Ref Level 3': True, 'Ref Level 4': True, 'Ref Level 5': True}
 )
 
 # Display the treemap in Streamlit
