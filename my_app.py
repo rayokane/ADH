@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import openpyxl
 
 # Load the full WWTP hierarchy from the Excel file
 file_path = 'IW-TEC-100-007.xlsx'
