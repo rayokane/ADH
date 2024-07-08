@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
-# Load the hierarchical data (replace 'path_to_hierarchy.csv' with your actual file path)
-# For the sake of demonstration, we'll recreate the hierarchy dataframe from previous steps.
+# Load the hierarchical data (using the same sample data as before)
 data = [
     ['ACCESS CONTROL SECURITY', 'ACCS', 'ACCESS CONTROL', 'ACCC'],
     ['ACCESS CONTROL SECURITY', 'ACCS', 'CCTV', 'CCTV'],
@@ -30,14 +30,18 @@ hierarchy_df = pd.DataFrame(data, columns=['Level 8 Class 1', 'L8 Ref Class 1', 
 # Streamlit app
 st.title('Asset Hierarchy')
 
-# Display the hierarchy in an expandable format
-current_class = None
+# Create a treemap using plotly
+fig = px.treemap(
+    hierarchy_df,
+    path=['Level 8 Class 1', 'Level 8 Class 2'],
+    values=[1]*len(hierarchy_df),  # Assigning an arbitrary value for size
+    color='Level 8 Class 1',
+    hover_data={'L8 Ref Class 1': True, 'L8 Ref Class 2': True}
+)
 
-for index, row in hierarchy_df.iterrows():
-    if row['Level 8 Class 1'] != current_class:
-        if current_class is not None:
-            st.markdown("---")
-        current_class = row['Level 8 Class 1']
-        st.subheader(f"{current_class} ({row['L8 Ref Class 1']})")
-    st.write(f"&emsp; - {row['Level 8 Class 2']} ({row['L8 Ref Class 2']})")
+# Display the treemap in Streamlit
+st.plotly_chart(fig, use_container_width=True)
 
+# Display a table for detailed view
+st.subheader("Detailed Hierarchy Data")
+st.dataframe(hierarchy_df)
