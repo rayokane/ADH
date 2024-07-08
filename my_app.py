@@ -1,44 +1,42 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import openpyxl
 
-# Load the full WWTP hierarchy from the Excel file
+# Load and inspect the WWTP sheet
 file_path = 'IW-TEC-100-007.xlsx'
 wwtp_df = pd.read_excel(file_path, sheet_name='WWTP')
 
-# Clean the data by dropping any fully empty columns and rows
+# Drop fully empty rows and columns
 wwtp_df.dropna(how='all', axis=1, inplace=True)
 wwtp_df.dropna(how='all', axis=0, inplace=True)
 
-# Display the cleaned data to understand its structure
-st.write("First few rows of the WWTP sheet:")
-st.dataframe(wwtp_df.head())
+# Extract hierarchical levels
+levels = wwtp_df['Return to Contents page'].dropna().unique()
 
-# Assuming columns represent hierarchical levels, extract these into a structured DataFrame
-# The columns to extract will depend on actual column names/structure seen in the above step
-# Example below assumes a certain structure, adjust as necessary
-columns_to_use = ['Return to Contents page', 'Unnamed: 1', 'Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4']
-
-# Renaming columns for clarity
-wwtp_df.columns = ['Level 1', 'Ref Level 1', 'Level 2', 'Ref Level 2', 'Level 3', 'Ref Level 3', 'Level 4', 'Ref Level 4', 'Level 5', 'Ref Level 5']
-
-# Filtering necessary columns
-hierarchy_data = wwtp_df[['Level 1', 'Ref Level 1', 'Level 2', 'Ref Level 2', 'Level 3', 'Ref Level 3', 'Level 4', 'Ref Level 4', 'Level 5', 'Ref Level 5']].dropna()
-
-# Creating a hierarchical data structure
+# Creating a structured DataFrame based on observed patterns
 data = []
 
-for _, row in hierarchy_data.iterrows():
-    data.append([
-        'Wastewater Treatment Plant',  # Adding the main plant type
-        'WWTP',
-        row['Level 1'], row['Ref Level 1'],
-        row['Level 2'], row['Ref Level 2'],
-        row['Level 3'], row['Ref Level 3'],
-        row['Level 4'], row['Ref Level 4'],
-        row['Level 5'], row['Ref Level 5']
-    ])
+# Loop through the DataFrame to create hierarchical data
+for i, level in enumerate(levels):
+    if "LEVEL 1" in level:
+        level_1 = levels[i + 1]
+    if "LEVEL 2" in level:
+        level_2 = levels[i + 1]
+    if "LEVEL 3" in level:
+        level_3 = levels[i + 1]
+    if "LEVEL 4" in level:
+        level_4 = levels[i + 1]
+    if "LEVEL 5" in level:
+        level_5 = levels[i + 1]
+        data.append([
+            'Wastewater Treatment Plant',  # Adding the main plant type
+            'WWTP',
+            level_1, 'Ref1',
+            level_2, 'Ref2',
+            level_3, 'Ref3',
+            level_4, 'Ref4',
+            level_5, 'Ref5'
+        ])
 
 # Convert to DataFrame
 hierarchy_df = pd.DataFrame(data, columns=[
