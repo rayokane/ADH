@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Load and inspect the WWTP sheet
+# Load the 'WWTP' sheet
 file_path = 'IW-TEC-100-007.xlsx'
 wwtp_df = pd.read_excel(file_path, sheet_name='WWTP')
 
@@ -10,37 +10,36 @@ wwtp_df = pd.read_excel(file_path, sheet_name='WWTP')
 wwtp_df.dropna(how='all', axis=1, inplace=True)
 wwtp_df.dropna(how='all', axis=0, inplace=True)
 
-# Extract hierarchical levels
-levels = wwtp_df['Return to Contents page'].dropna().unique()
+# Clean and prepare data
+wwtp_df.columns = ['Hierarchy']
+wwtp_df = wwtp_df.dropna().reset_index(drop=True)
 
-# Creating a structured DataFrame based on observed patterns
+# Find indices for each level
+level_indices = wwtp_df[wwtp_df['Hierarchy'].str.contains('LEVEL')].index.tolist()
+levels = ['Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 9']
+
+# Creating a hierarchical data structure
 data = []
+current_hierarchy = [''] * len(levels)
 
-# Loop through the DataFrame to create hierarchical data
-for i, level in enumerate(levels):
-    if "LEVEL 1" in level:
-        level_1 = levels[i + 1]
-    if "LEVEL 2" in level:
-        level_2 = levels[i + 1]
-    if "LEVEL 3" in level:
-        level_3 = levels[i + 1]
-    if "LEVEL 4" in level:
-        level_4 = levels[i + 1]
-    if "LEVEL 5" in level:
-        level_5 = levels[i + 1]
+for i in range(len(wwtp_df)):
+    if i in level_indices:
+        level = level_indices.index(i)
+        continue
+    current_hierarchy[level] = wwtp_df.loc[i, 'Hierarchy']
+    if level == 4:
         data.append([
-            'Wastewater Treatment Plant',  # Adding the main plant type
-            'WWTP',
-            level_1, 'Ref1',
-            level_2, 'Ref2',
-            level_3, 'Ref3',
-            level_4, 'Ref4',
-            level_5, 'Ref5'
+            'Wastewater Treatment Plant', 'WWTP',
+            current_hierarchy[0], 'Ref5',
+            current_hierarchy[1], 'Ref6',
+            current_hierarchy[2], 'Ref7',
+            current_hierarchy[3], 'Ref8',
+            current_hierarchy[4], 'Ref9'
         ])
 
 # Convert to DataFrame
 hierarchy_df = pd.DataFrame(data, columns=[
-    'Plant Type', 'Plant Type Ref', 'Level 1', 'Ref Level 1', 'Level 2', 'Ref Level 2', 'Level 3', 'Ref Level 3', 'Level 4', 'Ref Level 4', 'Level 5', 'Ref Level 5'
+    'Plant Type', 'Plant Type Ref', 'Level 5', 'Ref Level 5', 'Level 6', 'Ref Level 6', 'Level 7', 'Ref Level 7', 'Level 8', 'Ref Level 8', 'Level 9', 'Ref Level 9'
 ])
 
 # Streamlit app
@@ -49,10 +48,10 @@ st.title('Wastewater Treatment Plant Hierarchy')
 # Create a treemap using plotly
 fig = px.treemap(
     hierarchy_df,
-    path=['Plant Type', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
+    path=['Plant Type', 'Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 9'],
     values=[1]*len(hierarchy_df),  # Assigning an arbitrary value for size
-    color='Level 1',
-    hover_data={'Plant Type Ref': True, 'Ref Level 1': True, 'Ref Level 2': True, 'Ref Level 3': True, 'Ref Level 4': True, 'Ref Level 5': True}
+    color='Level 5',
+    hover_data={'Plant Type Ref': True, 'Ref Level 5': True, 'Ref Level 6': True, 'Ref Level 7': True, 'Ref Level 8': True, 'Ref Level 9': True}
 )
 
 # Display the treemap in Streamlit
