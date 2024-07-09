@@ -15,8 +15,8 @@ sheet_names = list(sheets.keys())
 df = sheets[sheet_names[0]]
 
 # Display the first few rows of the selected sheet
-st.write(f"First few rows of {sheet_names[0]} sheet:")
-st.dataframe(df.head())
+#st.write(f"First few rows of {sheet_names[0]} sheet:")
+#st.dataframe(df.head())
 
 # For visualization purposes, let's assume the hierarchy is represented by the first few columns
 # This needs to be adjusted based on the actual structure of the sheet
