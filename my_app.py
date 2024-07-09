@@ -24,8 +24,8 @@ hierarchy_df = df[hierarchy_columns]
 # Fill NA values to ensure proper hierarchical display
 hierarchy_df = hierarchy_df.fillna(method='ffill')
 
-# Create a treemap visualization using plotly with enhanced colors and text wrapping
-fig = px.treemap(
+# Create a treemap visualization using plotly with enhanced colors
+treemap_fig = px.treemap(
     hierarchy_df,
     path=hierarchy_columns,
     values=[1]*len(hierarchy_df),  # Arbitrary values to create the treemap
@@ -33,16 +33,32 @@ fig = px.treemap(
     color_discrete_sequence=px.colors.qualitative.Pastel
 )
 
-# Update layout for text wrapping
-fig.update_layout(
-    margin=dict(t=50, l=25, r=25, b=25),
-    treemapcolorway=px.colors.qualitative.Pastel
+# Create a sunburst chart visualization using plotly with enhanced colors
+sunburst_fig = px.sunburst(
+    hierarchy_df,
+    path=hierarchy_columns,
+    values=[1]*len(hierarchy_df),  # Arbitrary values to create the sunburst chart
+    color=hierarchy_columns[0],  # Coloring based on the top level
+    color_discrete_sequence=px.colors.qualitative.Pastel
 )
 
-# Apply text wrapping to the treemap
-fig.data[0].textinfo = 'label+text'
-fig.update_traces(texttemplate='%{label}<br>%{text}')
+# Create an icicle chart visualization using plotly with enhanced colors
+icicle_fig = px.icicle(
+    hierarchy_df,
+    path=hierarchy_columns,
+    values=[1]*len(hierarchy_df),  # Arbitrary values to create the icicle chart
+    color=hierarchy_columns[0],  # Coloring based on the top level
+    color_discrete_sequence=px.colors.qualitative.Pastel
+)
 
-# Display the treemap in Streamlit
+# Display the visualizations in Streamlit
 st.title('ADH')
-st.plotly_chart(fig, use_container_width=True)
+
+st.subheader('Treemap')
+st.plotly_chart(treemap_fig, use_container_width=True)
+
+st.subheader('Sunburst Chart')
+st.plotly_chart(sunburst_fig, use_container_width=True)
+
+st.subheader('Icicle Chart')
+st.plotly_chart(icicle_fig, use_container_width=True)
