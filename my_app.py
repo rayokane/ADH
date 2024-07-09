@@ -32,6 +32,7 @@ treemap_fig = px.treemap(
     color=hierarchy_columns[0],  # Coloring based on the top level
     color_discrete_sequence=px.colors.qualitative.Pastel
 )
+treemap_fig.update_traces(hoverinfo='none')  # Disable hover labels
 
 # Create a sunburst chart visualization using plotly with enhanced colors
 sunburst_fig = px.sunburst(
@@ -41,6 +42,7 @@ sunburst_fig = px.sunburst(
     color=hierarchy_columns[0],  # Coloring based on the top level
     color_discrete_sequence=px.colors.qualitative.Pastel
 )
+sunburst_fig.update_traces(hoverinfo='none')  # Disable hover labels
 
 # Create an icicle chart visualization using plotly with enhanced colors
 icicle_fig = px.icicle(
@@ -50,6 +52,7 @@ icicle_fig = px.icicle(
     color=hierarchy_columns[0],  # Coloring based on the top level
     color_discrete_sequence=px.colors.qualitative.Pastel
 )
+icicle_fig.update_traces(hoverinfo='none')  # Disable hover labels
 
 # Display the visualizations in Streamlit
 st.title('ADH')
