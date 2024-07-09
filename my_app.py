@@ -14,10 +14,6 @@ sheet_names = list(sheets.keys())
 # Assume we are working with the first sheet for the hierarchy visualization
 df = sheets[sheet_names[0]]
 
-# Display the first few rows of the selected sheet
-#st.write(f"First few rows of {sheet_names[0]} sheet:")
-#st.dataframe(df.head())
-
 # For visualization purposes, let's assume the hierarchy is represented by the first few columns
 # This needs to be adjusted based on the actual structure of the sheet
 
@@ -28,7 +24,7 @@ hierarchy_df = df[hierarchy_columns]
 # Fill NA values to ensure proper hierarchical display
 hierarchy_df = hierarchy_df.fillna(method='ffill')
 
-# Create a treemap visualization using plotly with enhanced colors
+# Create a treemap visualization using plotly with enhanced colors and text wrapping
 fig = px.treemap(
     hierarchy_df,
     path=hierarchy_columns,
@@ -36,6 +32,16 @@ fig = px.treemap(
     color=hierarchy_columns[0],  # Coloring based on the top level
     color_discrete_sequence=px.colors.qualitative.Pastel
 )
+
+# Update layout for text wrapping
+fig.update_layout(
+    margin=dict(t=50, l=25, r=25, b=25),
+    treemapcolorway=px.colors.qualitative.Pastel
+)
+
+# Apply text wrapping to the treemap
+fig.data[0].textinfo = 'label+text'
+fig.update_traces(texttemplate='%{label}<br>%{text}')
 
 # Display the treemap in Streamlit
 st.title('ADH')
