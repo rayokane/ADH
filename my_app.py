@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Load the spreadsheet file uploaded by the user
-file_path = '/mnt/data/Valid Hierarchy Values 07-05-2024.xlsx'
+file_path = 'Valid Hierarchy Values 07-05-2024.xlsx'
 
 # Load the data from the file
 sheets = pd.read_excel(file_path, sheet_name=None)
